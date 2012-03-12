@@ -57,51 +57,115 @@ class PylearnBot(ircbot.SingleServerIRCBot):
         author = irclib.nm_to_n(ev.source())
         message = ev.arguments()[0]
         msg_list = message.split()
+        admin_commands_list = {
+                '!die' : lambda : self.bot_die(serv),
+                '!off' : lambda : self.bot_off(serv),
+                '!on' : lambda : self.bot_on(serv),
+                '!save' : lambda : self.bot_save(serv),
+                '!load' : lambda : self.bot_load(serv),
+                '!search' : lambda : self.bot_search(serv, msg_list),
+                '!setratio' : lambda : self.bot_setratio(serv, msg_list)
+                }
+        free_commands_list = {
+                '!say' : lambda : self.bot_say(serv),
+                '!stats' : lambda : self.bot_stats(serv)
+                }
         if ((len(admins) == 0) or (author in admins)):
-            # Command detection
-            if (msg_list[0] == "!die"):
-                ircbot.SingleServerIRCBot.die(self, quitmsg)
-            if (msg_list[0] == "!off"):
-                self.activated = False
-                serv.privmsg(canal, "Ok, I won't say anything.")
-            if (msg_list[0] == "!on"):
-                self.activated = True
-                serv.privmsg(canal, "Here we go!")
-            if (msg_list[0] == "!save"):
-                self.botdico.save_dico("dico.save")
-                serv.privmsg(canal, "Done saving.")
-            if (msg_list[0] == "!load"):
-                self.botdico.load_dico("dico.save")
-                serv.privmsg(canal, "Done loading.")
-            if (msg_list[0] == "!search"):
-                if (len(msg_list) > 1):
-                    serv.privmsg(canal, self.botdico.get_sentence_with_name(msg_list[1]))
-                else:
-                    serv.privmsg(canal, "Please provide at least a word.")
-            if (msg_list[0] == "!ratio"):
-                if (len(msg_list) == 1):
-                    serv.privmsg(canal, "I will answer to 1/" + str(self.ratio) + " of the messages.")
-                else:
-                    try:
-                        neo_ratio = int(msg_list[1])
-                        if ((neo_ratio < 1) or (neo_ratio > 100)):
-                            serv.privmsg(canal, "The value must be between 1 and 100.")
-                        else:
-                            self.ratio = neo_ratio
-                            serv.privmsg(canal, "New ratio : I will answer to 1/" + str(self.ratio) + " of the messages")
-                    except (ValueError, IndexError):
-                        serv.privmsg(canal, "Incorrect parameter.")
-            if (msg_list[0] == "!say"):
-                serv.privmsg(canal, self.botdico.get_sentence())
-            if (msg_list[0] == "!stats"):
-                serv.privmsg(canal, "I know " + str(self.botdico.get_stats()) + " words!")
-        # No command
+            try:
+                admin_commands_list[msg_list[0]]()
+            except (KeyError):
+                pass
+            try:
+                free_commands_list[msg_list[0]]()
+            except (KeyError):
+                pass
+        else:
+            try:
+                free_commands_list[msg_list[0]]()
+            except (KeyError):
+                pass
+
+        # Auto answer
         if (message[0] != "!"):
             #print(author + " : " + message)
             self.botdico.parse(message)
             if (self.activated):
                 if (random.randint(0, self.ratio) == 0):
                     serv.privmsg(canal, self.botdico.get_sentence())
+
+    # Bot functions
+
+    ## bot_die
+    # Disconnect the bot from IRC
+    ##
+    def bot_die(self, serv, quitmsg):
+        ircbot.SingleServerIRCBot.die(self, quitmsg)
+
+    ## bot_off
+    # Turn off bot auto-response
+    ##
+    def bot_off(self, serv):
+        self.activated = False
+        serv.privmsg(canal, "Ok, I won't say anything.")
+
+    ## bot_on
+    # Turn on bot auto-response
+    ##
+    def bot_on(self, serv):
+        self.activated = True
+        serv.privmsg(canal, "Let's talk!")
+
+    ## bot_say
+    # Make the bot say something
+    ##
+    def bot_say(self, serv):
+        serv.privmsg(canal, self.botdico.get_sentence())
+
+    ## bot_stats
+    # Print how many words are known by the bot
+    ##
+    def bot_stats(self, serv):
+        serv.privmsg(canal, "I know " + str(self.botdico.get_stats()) + " words!")
+
+    ## bot_save
+    # Save the current database
+    ##
+    def bot_save(self, serv):
+        self.botdico.save_dico("dico.save")
+        serv.privmsg(canal, "Done saving.")
+
+    ## bot_load
+    # Load the stored database
+    ##
+    def bot_load(self, serv):
+        self.botdico.load_dico("dico.save")
+        serv.privmsg(canal, "Done loading.")
+
+    ## bot_search
+    # Print a sentence which begin with a certain word
+    ##
+    def bot_search(self, serv, msg_list):
+        if (len(msg_list) > 1):
+            serv.privmsg(canal, self.botdico.get_sentence_with_name(msg_list[1]))
+        else:
+            serv.privmsg(canal, "Please provide at least a word.")
+
+    ## bot_setratio
+    # Change the ratio of the bot
+    ##
+    def bot_setratio(self, serv, msg_list):
+        if (len(msg_list) == 1):
+            serv.privmsg(canal, "I will answer to 1/" + str(self.ratio) + " of the messages.")
+        else:
+            try:
+                neo_ratio = int(msg_list[1])
+                if ((neo_ratio < 1) or (neo_ratio > 100)):
+                    serv.privmsg(canal, "The value must be between 1 and 100.")
+                else:
+                    self.ratio = neo_ratio
+                    serv.privmsg(canal, "New ratio : I will answer to 1/" + str(self.ratio) + " of the messages")
+            except (ValueError, IndexError):
+                serv.privmsg(canal, "Incorrect parameter.")
 
 # Starting bot
 PylearnBot().start()
