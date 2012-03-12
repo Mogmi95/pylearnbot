@@ -18,7 +18,7 @@ server = "chat.freenode.org"
 # Which port
 port = 6667
 # Channel where the bot will join
-canal = "#hmm-la-bd"
+canal = "#lqdn-ccc"
 # The name of the bot
 name = "Mogbot"
 # The description of the bot (/whois)
@@ -42,7 +42,7 @@ class PylearnBot(ircbot.SingleServerIRCBot):
 
     def __init__(self):
         ircbot.SingleServerIRCBot.__init__(self, [(server, port)], name, description)
-        self.botDico = pylearndico.PylearnDico()
+        self.botdico = pylearndico.PylearnDico()
 
     ## on_welcome(serv, ev)
     # Event starting when the bot connect to the server
@@ -68,14 +68,14 @@ class PylearnBot(ircbot.SingleServerIRCBot):
                 self.activated = True
                 serv.privmsg(canal, "Here we go!")
             if (msg_list[0] == "!save"):
-                self.botDico.saveDico("dico.save")
+                self.botdico.save_dico("dico.save")
                 serv.privmsg(canal, "Done saving.")
             if (msg_list[0] == "!load"):
-                self.botDico.loadDico("dico.save")
+                self.botdico.load_dico("dico.save")
                 serv.privmsg(canal, "Done loading.")
             if (msg_list[0] == "!search"):
                 if (len(msg_list) > 1):
-                    serv.privmsg(canal, self.botDico.getSentenceWithName(msg_list[1]))
+                    serv.privmsg(canal, self.botdico.get_sentence_with_name(msg_list[1]))
                 else:
                     serv.privmsg(canal, "Please provide at least a word.")
             if (msg_list[0] == "!ratio"):
@@ -83,25 +83,25 @@ class PylearnBot(ircbot.SingleServerIRCBot):
                     serv.privmsg(canal, "I will answer to 1/" + str(self.ratio) + " of the messages.")
                 else:
                     try:
-                        neoRatio = int(msg_list[1])
-                        if ((neoRatio < 1) or (neoRatio > 100)):
+                        neo_ratio = int(msg_list[1])
+                        if ((neo_ratio < 1) or (neo_ratio > 100)):
                             serv.privmsg(canal, "The value must be between 1 and 100.")
                         else:
-                            self.ratio = neoRatio
+                            self.ratio = neo_ratio
                             serv.privmsg(canal, "New ratio : I will answer to 1/" + str(self.ratio) + " of the messages")
                     except (ValueError, IndexError):
                         serv.privmsg(canal, "Incorrect parameter.")
             if (msg_list[0] == "!say"):
-                serv.privmsg(canal, self.botDico.getSentence())
+                serv.privmsg(canal, self.botdico.get_sentence())
             if (msg_list[0] == "!stats"):
-                serv.privmsg(canal, "I know " + str(self.botDico.getStats()) + " words!")
+                serv.privmsg(canal, "I know " + str(self.botdico.get_stats()) + " words!")
         # No command
         if (message[0] != "!"):
             #print(author + " : " + message)
-            self.botDico.parse(message)
+            self.botdico.parse(message)
             if (self.activated):
                 if (random.randint(0, self.ratio) == 0):
-                    serv.privmsg(canal, self.botDico.getSentence())
+                    serv.privmsg(canal, self.botdico.get_sentence())
 
 # Starting bot
 PylearnBot().start()

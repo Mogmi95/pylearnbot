@@ -29,18 +29,18 @@ class PylearnDico():
     #       - "|END|" : list of words which ends a sentence
     ##
     words = {}
-    beginWord = "|BEGIN|"
-    endWord = "|END|"
+    begin_word = "|BEGIN|"
+    end_word = "|END|"
 
-    ## cutChars
+    ## cut_chars
     # List of characters that define a pause in a sentence
     ##
-    cutChars = [',', ';', ':']
+    cut_chars = [',', ';', ':']
 
-    ## endChars
+    ## end_chars
     # List of characters that define the end of a sentence
     ##
-    cutChars = ['.', '!', '?']
+    end_chars = ['.', '!', '?']
 
     ## blacklist
     # Words that must not be added into the dictionary
@@ -51,119 +51,118 @@ class PylearnDico():
     # Interface #
     #############
 
-    ## newDico()
+    ## new_dico()
     # Create a new PylearnDico, erase the current one
     ##
-    def newDico(self):
+    def new_dico(self):
         self.words = {}
 
-    ## loadDico(string filename)
+    ## load_dico(string filename)
     # Load PylearnDico from the file filename
     ##
-    def loadDico(self, filename):
-        loadFile = open(filename, "rb")
-        self.words = pickle.load(loadFile)
-        loadFile.close()
+    def load_dico(self, filename):
+        load_file = open(filename, "rb")
+        self.words = pickle.load(load_file)
+        load_file.close()
 
-    ## saveDico(string filename)
+    ## save_dico(string filename)
     # Save the current dico to the file filename
     ##
-    def saveDico(self, filename):
-        saveFile = open(filename, "wb")
-        pickle.dump(self.words, saveFile)
-        saveFile.close()
+    def save_dico(self, filename):
+        save_file = open(filename, "wb")
+        pickle.dump(self.words, save_file)
+        save_file.close()
 
     ## parse(string sentence)
     # Read a string and learn new word and constructions from it
     ##
     def parse(self, sentence):
-        currentWord = 0
+        current_word = 0
         words = sentence.split()
-        lastWord = len(words) - 1
+        last_word = len(words) - 1
         for word in sentence.split():
             # print(word)
             # If first word, we append to BEGIN
-            if (currentWord == 0):
-                self.addSuccessorToWord(self.beginWord, word)
+            if (current_word == 0):
+                self.add_successor_to_word(self.begin_word, word)
             # Else we append to the previous word
             else:
-                self.addSuccessorToWord(words[currentWord - 1], word)
+                self.add_successor_to_word(words[current_word - 1], word)
             # If last word, we append to END
-            if (currentWord == lastWord):
-                self.addSuccessorToWord(word, self.endWord)
-            currentWord += 1
+            if (current_word == last_word):
+                self.add_successor_to_word(word, self.end_word)
+            current_word += 1
         #print("DONE")
         #print(self.words)
 
-    ## getSentence()
+    ## get_sentence()
     # Return a string created from words already learned
     ##
-    def getSentence(self):
-        currentWord = self.getRandomNextWord(self.beginWord)
-        sentence = currentWord
-        currentWord = self.getRandomNextWord(currentWord)
-        while (currentWord != self.endWord):
-            sentence += " " + currentWord
-            currentWord = self.getRandomNextWord(currentWord)
+    def get_sentence(self):
+        current_word = self.get_random_next_word(self.begin_word)
+        sentence = current_word
+        current_word = self.get_random_next_word(current_word)
+        while (current_word != self.end_word):
+            sentence += " " + current_word
+            current_word = self.get_random_next_word(current_word)
         return sentence
 
-    ## getSentenceWithName(string login)
+    ## get_sentence_with_name(string login)
     # Return a string which begin with "login"
     ##
-    def getSentenceWithName(self, login):
+    def get_sentence_with_name(self, login):
         if not(login in self.words):
             return "Sorry, " + login + " is not present in the database."
-        currentWord = login
-        sentence = currentWord
-        currentWord = self.getRandomNextWord(currentWord)
-        while (currentWord != self.endWord):
-            sentence += " " + currentWord
-            currentWord = self.getRandomNextWord(currentWord)
+        current_word = login
+        sentence = current_word
+        current_word = self.get_random_next_word(current_word)
+        while (current_word != self.end_word):
+            sentence += " " + current_word
+            current_word = self.get_random_next_word(current_word)
         return sentence
 
 
-    ## getStats()
+    ## get_stats()
     # Return a string which gives information about the current database,
     # such as number of words
     ##
-    def getStats(self):
+    def get_stats(self):
         return len(self.words)
 
-    ## removeWord(string word)
+    ## remove_word(string word)
     # Delete a word from the dico
     ##
-    def removeWord(self, word):
+    def remove_word(self, word):
         if (word in self.words):
             self.words.remove(word)
 
-    ## blacklistWord(string word)
+    ## blacklist_word(string word)
     # Add a word to the blacklist. Those words won't be stored
     ##
-    def blacklistWord(self, word):
+    def blacklist_word(self, word):
         if not(word in self.blacklist):
             self.blacklist.append(word)
 
-    ## unBlacklistWord(string word)
+    ## un_blacklist_word(string word)
     # Remove a word from the blacklist.
     ##
-    def unBlacklistWord(self, word):
-        if not(word in self.blacklist):
-            self.blacklist.remove(word)
+    def un_blacklist_bord(self, word):
+        self.blacklist.remove(word)
 
-    ## getBlackList()
+    ## get_blackList()
     # Return list of blacklisted words
     ##
-    def getBlacklist(self):
+    def get_blacklist(self):
         return self.blacklist
 
     #############
     # Functions #
     #############
 
-    ## addSuccessorToWord(string word, string successor)
+    ## add_successor_to_word(string word, string successor)
     # Add the string successor as a potential next to word
     ##
-    def addSuccessorToWord(self, word, successor):
+    def add_successor_to_word(self, word, successor):
         if not(word in self.words):
             self.words[word] = {}
         if (successor in self.words[word]):
@@ -171,18 +170,18 @@ class PylearnDico():
         else:
             self.words[word][successor] = 1
 
-    ## getRandomNextWord(string word)
+    ## get_random_next_word(string word)
     # Return a word who can follow 'word'
     ##
-    def getRandomNextWord(self, word):
+    def get_random_next_word(self, word):
         ## A working but too simple algorithm
         #result = random.choice(list(self.words[word].keys()))
         ##
 
         ## This one is better, but awful
-        wordList = []
+        word_list = []
         for key, weight in self.words[word].items():
             for i in range(0, weight):
-                wordList.append(key)
-        result = random.choice(wordList)
+                word_list.append(key)
+        result = random.choice(word_list)
         return result
