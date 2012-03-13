@@ -15,6 +15,8 @@
 import pickle
 # Module for Random
 import random
+# Module for regexp
+import re
 
 class PylearnDico():
 
@@ -35,12 +37,12 @@ class PylearnDico():
     ## cut_chars
     # List of characters that define a pause in a sentence
     ##
-    cut_chars = [',;:']
+    cut_chars = '[,;:]'
 
     ## end_chars
     # List of characters that define the end of a sentence
     ##
-    end_chars = ['.!?']
+    end_chars = '[.!?]'
 
     ## blacklist
     # Words that must not be added into the dictionary
@@ -77,13 +79,15 @@ class PylearnDico():
     # Read a string and learn new word and constructions from it
     ##
     def parse(self, sentence):
-        sentences = sentence.split(self.end_chars)
+        sentences = re.split(self.end_chars, sentence)
+        print('Sentences = ' + str(sentences))
         for sentence in sentences:
+            print("    sentence : " + str(sentence))
             current_word = 0
-            words = sentence.split(self.end_chars)
+            words = sentence.split()
             last_word = len(words) - 1
-            for word in sentence.split():
-                # print(word)
+            for word in words:
+                print('        Word : ' + word)
                 # If first word, we append to BEGIN
                 if (current_word == 0):
                     self.add_successor_to_word(self.begin_word, word)
