@@ -35,12 +35,12 @@ class PylearnDico():
     ## cut_chars
     # List of characters that define a pause in a sentence
     ##
-    cut_chars = [',', ';', ':']
+    cut_chars = [',;:']
 
     ## end_chars
     # List of characters that define the end of a sentence
     ##
-    end_chars = ['.', '!', '?']
+    end_chars = ['.!?']
 
     ## blacklist
     # Words that must not be added into the dictionary
@@ -77,23 +77,25 @@ class PylearnDico():
     # Read a string and learn new word and constructions from it
     ##
     def parse(self, sentence):
-        current_word = 0
-        words = sentence.split()
-        last_word = len(words) - 1
-        for word in sentence.split():
-            # print(word)
-            # If first word, we append to BEGIN
-            if (current_word == 0):
-                self.add_successor_to_word(self.begin_word, word)
-            # Else we append to the previous word
-            else:
-                self.add_successor_to_word(words[current_word - 1], word)
-            # If last word, we append to END
-            if (current_word == last_word):
-                self.add_successor_to_word(word, self.end_word)
-            current_word += 1
-        #print("DONE")
-        #print(self.words)
+        sentences = sentence.split(self.end_chars)
+        for sentence in sentences:
+            current_word = 0
+            words = sentence.split(self.end_chars)
+            last_word = len(words) - 1
+            for word in sentence.split():
+                # print(word)
+                # If first word, we append to BEGIN
+                if (current_word == 0):
+                    self.add_successor_to_word(self.begin_word, word)
+                # Else we append to the previous word
+                else:
+                    self.add_successor_to_word(words[current_word - 1], word)
+                # If last word, we append to END
+                if (current_word == last_word):
+                    self.add_successor_to_word(word, self.end_word)
+                current_word += 1
+            #print("DONE")
+            #print(self.words)
 
     ## get_sentence()
     # Return a string created from words already learned

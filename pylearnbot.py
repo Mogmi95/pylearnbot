@@ -64,7 +64,7 @@ class PylearnBot(ircbot.SingleServerIRCBot):
                 '!save' : lambda : self.bot_save(serv),
                 '!load' : lambda : self.bot_load(serv),
                 '!search' : lambda : self.bot_search(serv, msg_list),
-                '!setratio' : lambda : self.bot_setratio(serv, msg_list)
+                '!ratio' : lambda : self.bot_setratio(serv, msg_list)
                 }
         free_commands_list = {
                 '!say' : lambda : self.bot_say(serv),
